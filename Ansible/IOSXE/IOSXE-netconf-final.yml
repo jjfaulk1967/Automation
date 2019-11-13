@@ -1,0 +1,71 @@
+---
+- name: NTC SHOW COMMAND
+  hosts: 192.168.122.10
+  connection: local
+  gather_facts: false
+
+  tasks:
+    - name: SHOW VERSION
+      ntc_show_command:
+        connection: ssh
+        platform: cisco_ios
+        command: show version
+        template_dir: "/root/modules/ntc-ansible/ntc-templates/templates" # Specifies where to search templates
+        host: 192.168.122.10
+        username: cisco
+        password: cisco
+
+      register: show_version_output
+
+    - name: SHOW VERSION OUTPUT
+      debug: var=show_version_output
+
+    - name: SHOW IP INT BRIEF
+      ntc_show_command:
+        connection: ssh
+        platform: cisco_ios
+        command: show ip int brief
+        template_dir: "/root/modules/ntc-ansible/ntc-templates/templates" # Specifies where to search templates
+        host: 192.168.122.10
+        username: cisco
+        password: cisco
+
+      register: show_ip_int_brief_output
+
+    - name: SHOW IP INTERFACE BRIEF OUTPUT
+      debug: var=show_ip_int_brief_output
+
+    - name: SHOW IP BGP SUMM
+      ntc_show_command:
+        connection: ssh
+        platform: cisco_ios
+        command: show ip bgp summ
+        template_dir: "/root/modules/ntc-ansible/ntc-templates/templates" # Specifies where to search templates
+        host: 192.168.122.10
+        username: cisco
+        password: cisco
+
+      register: show_ip_bgp_sum_output
+
+    - name: SHOW IP BGP SUM OUTPUT
+      debug: var=show_ip_bgp_sum_output
+
+    - name: SHOW IP ROUTE
+      ntc_show_command:
+        connection: ssh
+        platform: cisco_ios
+        command: show ip route
+        template_dir: "/root/modules/ntc-ansible/ntc-templates/templates" # Specifies where to search templates
+        host: 192.168.122.10
+        username: cisco
+        password: cisco
+
+      register: show_ip_route_output
+
+    - name: SHOW IP ROUTE OUTPUT
+      debug: var=show_ip_route_output
+
+    - name: INSERT IOS-XE SHOW COMMAND OUTPUT INTO JINJA2 TEMPLATE
+      template: >
+        src=/root/Automation/Jinja2/IOSXE-netconf-show-commands.j2
+        dest=/root/Output/IOSXE/iosxe-netconf-show-command-output.txt
