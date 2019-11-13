@@ -1,0 +1,4 @@
+HOST: {{ search_job_results.json.messages[0].map._sourcehost }}
+
+MESSAGE:
+        {{ search_job_results.json.messages[0].map._raw }}
