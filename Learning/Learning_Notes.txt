@@ -1,0 +1,163 @@
+Cisco DEVNET
+	https://developer.cisco.com/
+	http://github.com/CiscoDevNet
+	http://github.com/hpreston
+		Video Courses
+			https://developer.cisco.com/video/net-prog-basics/
+				github.com/CiscoDevNet/netprog_basics
+
+1) JSON, XML, YAML are data formats.
+2) "Key" : "Value"
+	a.Key identifies/lables a set of data.
+  b.Value is the data.
+3) XML uses tags <tags></tags>
+4) JSON
+	a. {} used for objects
+	b. [] used for arrays. Also called a list object.
+		1. An array is a list. A list contains elements. An element is a key:value pair.
+	c. a , is used to end a list or element.
+5) YAML
+	a. Used for configuration files.
+	b. Whitespace indentation defines structure.
+	c. A - character indicates a list element.
+6) Netconf
+	a. Uses ssh and xml.
+	b. Uses YANG for data modeling language
+7) Restconf
+	a. Provide rest api like interface to network.
+	b. Uses HTTP and supports XML & JSON
+	c. Uses YANG for data modeling language.
+
+8) REST
+	a. http://server/resource/parameters
+		1. Server = server or host
+		2. Resource = location of the data or oject of interest on the server.
+		3. Parameters = details to scope, filter, or clarify a request.
+	b. CRUD
+		1. Create = POST = create a new object or resouce.
+		2. Read = GET = retrieve details from the system.
+		3. Update = PUT = replace or update a resource.
+		4. Delete = DELETE = remove a resource from the system.
+	c. Response codes
+		1. 200 = ok
+		2. 404 = not found (resource not found)
+		3. 201 = Created (new resource created)
+		4) 400 = bad request
+		5) 401 = unauthorized
+		6) 403 = Forbidden
+		7) 500 = Internal server error
+		8) 503 = Service unavailable
+	d. Headers
+		1. Content-Type = specify the format of the data in the body. (application/json)
+		2. Accept = Specify the requested format for returned data (application/json)
+		3) Authorization = provide credentials to authoize a request.
+		4) Date - date and time of message.
+		5) Headers are included in both the request and response.
+9) Postman
+	a. www.getpostman.com
+10) YANG
+	a. Use netconf & restconf as the transport interfaces to get access to the YANG data models.
+	b. YANG broken down into two types of data models.
+		1. Device (interface, vlan etc)
+		2. Service (ACL, BGP, etc)
+	c. Where do YANG data models come from?
+		1. Standard (IETF)
+		2. Vendor (Cisco)
+		3. https://github.com/YangModels/yang (both standard and vendor)
+		4. YANG data can be represented in XML or JSON
+		5. PYANG
+11) NETCONF
+	a. After connection using SSH, server (agent) sends hello to client (manager). Then client responds back with it's own hello.
+	b. Each RPC in a NETCONF communication with have an operation.
+		1. <get> = retrieve running configuration and device state information.
+		2. <get-config. = retrieve all or part of specified configuration data store.
+		3. <edit-config> = load all or part of a configuration to the specified configuration data store.
+		4. <copy-config> = Replace an entire configuration data store with another.
+		5. <delete-config> = Delete a configuration data store.
+		6. <commit> = Copy candidate data store to running data store.
+		7. <lock> / <unlock> = Lock or unlock the entire configuration data store system.
+		8. <close-session> = Graceful termination of netconf session.
+		9. <kill-session> = Forced termination of netconf session.
+	c. Must use running data store at a minimum.
+	d. Ncclient. Library in python that simplies connection and communication with netconf agent.
+12) RESTCONF
+	a. Operations (RESTCONF = NETCONF)
+		1. GET = <get> , <get-config>
+		2. POST = <get-config> (operations = create)
+		3. PUT = <get-config> (operation = create/replace)
+		4. PATCH = <get-config> (operation = merge)
+		5. DELETE = <get-config> (operation = delete)
+	b MINE Types
+		1. application/yang-data+json
+		2. application/yang-data+xml
+13) NX-API
+	a. NX-API - Two differnet frameworks.
+		1. NX-API CLI =  Interface with nexus over it's API using CLI commands.
+			a. json-rpc
+				1. Defines request and response format. (i.e use CLI commands)
+			b. INS-API
+				1. Supports XML & JSON
+				2. Specific to Cisco.
+				3. Support for sending bash commands.
+				4. Uses CLI commands.
+		2. NX-API REST = Interface with nexus over it's full API using underlying objects and data models.
+	b. Sandbox
+		1. https://switch-ip
+14) NX-API REST
+	a. https://developer.cisco.com/media/dme/index.html
+	b. https://switch-ip/visore.html+
+15) Ansible for network setup.
+	a. Create ansible._env
+	b. NXOS modules default to CLI.
+		1. Use transport: nxapi for API
+16) RESTCONF
+	a. Follows this format.
+		1. https://<ADDRESS>/<ROOT>/data/<[YANG MODULE:]CONTAINER>/<LEAF>[?<OPTIONS>]
+	b.
+
+		Learning Labs
+		Development Sandboxes
+
+####################################################################
+1) Non valid variables in Ansible
+	a. A '-' is a non valid variable.
+	b. Use ['non-valid-variable'] in your path when inserting into a jinja2 tempate.
+2) Understanding ansible output
+	a. An '{' is the beginning of a dictionary. An '}' is the end of that dictionary.
+	b. An '[' is the beginning of a list. An ']' is the end of that list.
+	c An ',' separates a index, dictionary, list, or key:value pair.
+3) Jinja2 templates
+	a. Comment out a line by using {# foo #}
+	b. Don't require a ' "" ' on the lines.
+
+
+#####################TOOLS######################################
+1) PYANG
+	a. git clone https://github.com/YangModels/yang.git
+	b. pyang -f tree *.yang
+2) TextFSM
+	a. Used to take IOS CLI output and convert into JSON.
+	b. Uses community created template.
+	c. https://github.com/networktocode/ntc-ansible
+
+
+
+
+#################IOS-XE###########################################
+1) Login credentials
+	a. Define hosts by group name in HOSTS file.
+	b. Create YML file in group_vars.
+		1. File name should reference name of group defined in HOSTS file.
+	c.ansible_connection: network_cli
+		ansible_network_os: ios
+		ansible_user: cisco
+		ansible_ssh_pass: cisco
+		ansible_become: yes
+		ansible_become_method: enable
+		ansible_become_pass: cisco
+
+####################HOW TO FIX######################################
+1) ssh
+	a. Getting error Bad owner or permissions on /root/.ssh/config.
+	b. Happens when trying to ssh to a network device.
+	c. Fix: chown root /root/.ssh/config
