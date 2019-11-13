@@ -1,0 +1,24 @@
+---
+- name: HTTPERF &  SIEGE
+  hosts: 192.168.10.3
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: HTTPERF 192.168.10.3
+      command: httperf --server 192.168.10.3 --port 80 --num-conns 100 --rate 10 --timeout 1
+
+      register: output
+
+    - name: HTTPERF OUTPUT
+      debug:
+        msg: "{{ output }}"
+
+    - name: SIEGE 192.168.10.3
+      command: siege -t 10s http://192.168.10.3
+
+      register: siege_output
+
+    - name: SIEGE OUTPUT
+      debug:
+        msg: "{{ siege_output }}"
