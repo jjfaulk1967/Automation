@@ -1,0 +1,97 @@
+https://github.com/httperf/httperf
+!
+https://www.pcsuggest.com/best-lightweight-web-server-linux/
+ /etc/webfsd.conf
+ /var/www/html/index.html
+!
+https://docs.ansible.com/ansible/latest/modules/uri_module.html#uri-module
+!
+auto eth0
+iface eth0 inet static
+ address 10.0.0.5
+ netmask 255.255.255.0
+ network 10.0.0.0
+ broadcast 10.0.0.255
+ gateway 10.0.0.1
+
+
+curl -k https://192.168.1.2/axapi/v3/auth \
+-H "Content-Type:application/json" \
+-d '{
+    "credentials": {
+        "username": "admin",
+        "password": "a10"
+    }
+}'
+{
+  "authresponse" : {
+     "signature":"XXXXXXXXXXXXXXXXXX",
+     "description":"the signature should be set in Authorization header for following request."
+   }
+
+
+
+
+curl -k GET https://192.168.1.2/axapi/v3/slb/server/XYZ2.XXXXX.COM/stats \
+-H "Content-Type:application/json" \ 
+-H "Authorization: A10 XXXXXXXXXXXXXXXXXXXXXXXXXXX"
+
+
+ping 
+
+
+
+
+!
+!
+slb service-group WIKI.DEV.XXXXX.COM_HTTP tcp
+  health-check HM_TCP_80
+  member WIKI.DEV.XXXXX.COM-NGINIX 80
+!
+slb service-group WIKI.DEV.XXXXX.COM_HTTPS tcp
+  health-check HM_TCP_443
+  member WIKI.DEV.XXXXX.COM-NGINIX 443
+!
+slb server WIKI.DEV.XXXXX.COM-NGINIX 10.1.16.65
+  port 80 tcp
+  port 443 tcp
+!
+health monitor HM_TCP_80
+  method tcp port 80
+!
+health monitor HM_TCP_443
+  method tcp port 443
+!
+ip nat pool SRCNAT_DEV_APP_DMZ 10.1.23.250 10.1.23.254 netmask /21
+!
+slb virtual-server WIKI.DEV.XXXXX.COM-EXT 1.1.1.1 /32
+  port 80 tcp
+    name WIKI.DEV.XXXXX.COM_HTTP
+    syn-cookie
+    source-nat pool SRCNAT_DEV_APP_DMZ
+    service-group WIKI.DEV.XXXXX.COM_HTTP
+  port 443 tcp
+    name WIKI.DEV.XXXXX.COM_HTTPS
+    source-nat pool SRCNAT_DEV_APP_DMZ
+    service-group WIKI.DEV.XXXXX.COM_HTTPS
+!
+
+
+
+slb service-group XYZ.XXXXX.COM_HTTP tcp
+ health-check XYZ_TCP_80
+ member XYZ1.XXXXX.COM 80
+ member XYZ2.XXXXX.COM 80
+!
+health monitor XYZ_TCP_80
+ method tcp port 80
+!
+slb server XYZ1.XXXXX.COM 10.0.0.4
+ port 80 tcp
+slb server XYZ2.XXXXX.COM 10.0.0.6
+ port 80 tcp
+!
+slb virtual-server XYX.XXXXX.COM 192.168.10.3 /32
+ port 80 tcp
+  name XYZ.XXXXX.COM_HTTP
+  service-group XYZ.XXXXX.COM_HTTP
