@@ -1,0 +1,98 @@
+Orchestrator:
+  Hostname: {{ system_info.json.hostName }}
+  IP Address: {{ system_info.json.host }}
+  Release: {{ system_info.json.release }}
+  Uptime: {{ system_info.json.uptime }}
+
+Remote Sites: (1 = UP, 2 = Down)
+  Hostname: {{ appliance_info.json[0].hostName }}
+  Model: {{ appliance_info.json[0].model }}
+  Serial Number: {{ appliance_info.json[0].serial }}
+  Release: {{ appliance_info.json[0].softwareVersion }}
+  Up / Down: {{ appliance_info.json[0].state }}
+
+  Hostname: {{ appliance_info.json[1].hostName }}
+  Model: {{ appliance_info.json[1].model }}
+  Serial Number: {{ appliance_info.json[1].serial }}
+  Release {{ appliance_info.json[1].softwareVersion }}
+  Up / Down: {{ appliance_info.json[1].state }}
+
+  Hostname: {{ appliance_info.json[2].hostName }}
+  Model: {{ appliance_info.json[2].model }}
+  Serial Number: {{ appliance_info.json[2].serial }}
+  Release {{ appliance_info.json[2].softwareVersion }}
+  Up / Down: {{ appliance_info.json[2].state }}
+
+  Hostname: {{ appliance_info.json[3].hostName }}
+  Model: {{ appliance_info.json[3].model }}
+  Serial Number: {{ appliance_info.json[3].serial }}
+  Release {{ appliance_info.json[3].softwareVersion }}
+  Up / Down: {{ appliance_info.json[3].state }}
+
+  Hostname: {{ appliance_info.json[4].hostName }}
+  Model: {{ appliance_info.json[4].model }}
+  Serial Number: {{ appliance_info.json[4].serial }}
+  Release {{ appliance_info.json[4].softwareVersion }}
+  Up / Down: {{ appliance_info.json[4].state }}
+
+  Hostname: {{ appliance_info.json[5].hostName }}
+  Model: {{ appliance_info.json[5].model }}
+  Serial Number: {{ appliance_info.json[5].serial }}
+  Release {{ appliance_info.json[5].softwareVersion }}
+  Up / Down: {{ appliance_info.json[5].state }}
+
+  Hostname: {{ appliance_info.json[6].hostName }}
+  Model: {{ appliance_info.json[6].model }}
+  Serial Number: {{ appliance_info.json[6].serial }}
+  Release {{ appliance_info.json[6].softwareVersion }}
+  Up / Down: {{ appliance_info.json[6].state }}
+
+  Hostname: {{ appliance_info.json[7].hostName }}
+  Model: {{ appliance_info.json[7].model }}
+  Serial Number: {{ appliance_info.json[7].serial }}
+  Release {{ appliance_info.json[7].softwareVersion }}
+  Up / Down: {{ appliance_info.json[7].state }}
+
+TOP TALKERS: (11/1/2018 - 24 HOURS)
+
+  Source IP Address: {{ top_talkers_info.json[0].SOURCE_IP }}
+  Number of Flows: {{ top_talkers_info.json[0].FLOW_COUNT }}
+
+    LAN:
+      Received Bytes: {{ top_talkers_info.json[0].LANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[0].LANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[0].LANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[0].LANTX_PKTS }}
+    WAN:
+      Received Bytes: {{ top_talkers_info.json[0].WANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[0].WANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[0].WANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[0].WANTX_PKTS }}
+
+  Source IP Address: {{ top_talkers_info.json[1].SOURCE_IP }}
+  Number of Flows: {{ top_talkers_info.json[1].FLOW_COUNT }}
+
+    LAN:
+      Received Bytes: {{ top_talkers_info.json[1].LANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[1].LANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[1].LANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[1].LANTX_PKTS }}
+    WAN:
+      Received Bytes: {{ top_talkers_info.json[1].WANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[1].WANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[1].WANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[1].WANTX_PKTS }}
+
+  Source IP Address: {{ top_talkers_info.json[2].SOURCE_IP }}
+  Number of Flows: {{ top_talkers_info.json[2].FLOW_COUNT }}
+
+    LAN:
+      Received Bytes: {{ top_talkers_info.json[2].LANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[2].LANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[2].LANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[2].LANTX_PKTS }}
+    WAN:
+      Received Bytes: {{ top_talkers_info.json[2].WANRX_BYTES }}
+      Transmitted Bytes: {{ top_talkers_info.json[2].WANTX_BYTES }}
+      Received Packets: {{ top_talkers_info.json[2].WANRX_PKTS }}
+      Transmitted Packets: {{ top_talkers_info.json[2].WANTX_PKTS }}
