@@ -1,0 +1,21 @@
+#Sample GENIE CLI Commands
+1) genie <<command>> <<module>> --testbed <<testbed name>> --output <<name of output folder>>
+    a. genie learn interface --testbed testbed.yaml --output learn
+2) genie <<command>> <<module>> --testbed <<testbed name>> --device <<name of device>> --output <<name of output folder>>
+    a. genie learn interface --testbed testbed.yaml --device ROUTER-A1 --output learn
+3) genie <<command>> <<directory1>> <<directory2>> --output <<name of output folder>>
+    a. genie diff learn learn2 --output diff1
+4) genie <<command>> <<module>> --testbed <<testbed name>> --output <<name of output folder>>
+    a. genie learn all --testbed testbed.yaml --output learn
+5) genie diff dir1 dir2 --exclude “age”
+6) genie diff dir1 dir2 --no-default-exclusion --exclude “age” “uptime”
+----------------------------------
+ROBOT
+----------------------------------
+1) robot --help
+2) robot -d <output directory name> <file.robot>
+    robot -d output test.ROBOT
+3) robot -d test1 --variable snapshot:./test1/snapshot --variable devices:"XXXXXXXXXXXXX" --variable features:"config" snapshot.robot
+4) robot -d diff --variable snapshot1:./test1/snapshot --variable snapshot2:./test2/snapshot --variable devices:"XXXXXXXXXXXXXXX" compare.robot
+5) robot -d output --variable snapshot:/export/home/username/robot/baseline_snapshots/XXXXXXXXXXXXXXX --variable devices:"XXXXXXXXXXXXXXX" --variable features:"config;interface" baseline_snapshot.robot
+
