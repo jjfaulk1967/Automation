@@ -1,0 +1,260 @@
+---
+#
+# PLAY #1
+# CREATE SERVERS, SERVICE GROUP AND VIRTUAL SERVER FOR XYZ.XXXXX.COM
+#
+- name: A10
+  hosts: 192.168.1.2
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: A10 LOGIN
+      uri:
+       url: https://192.168.1.2/axapi/v3/auth
+       method: POST
+       validate_certs: no
+       body_format: json
+       body:
+        credentials:
+            username: admin
+            password: a10
+
+      register: login
+
+#    - name: CREATE XYZ TCP 80 MONITOR
+#      uri:
+#       url: https://192.168.1.2/axapi/v3/health/monitor \
+#       method: POST
+#       body_format: json
+#       validate_certs: no
+#       return_content: yes
+#       headers:
+#        Authorization: "A10 {{ login.json.authresponse.signature }}"
+#       body:
+#        {"monitor":
+#          {
+#           "name": "XYZ-TCP-80",
+#           "method": {
+#             "tcp": {
+#              "method-tcp": yes,
+#              "tcp-port": 80
+#             }
+#            }
+#          }
+#        }
+#
+
+#    - name: CREATE SERVER XYZ1.XXXXX.COM
+#      uri:
+#       url: https://192.168.1.2/axapi/v3/slb/server \
+#       method: POST
+#       body_format: json
+#       validate_certs: no
+#       return_content: yes
+#       headers:
+#        Authorization: "A10 {{ login.json.authresponse.signature }}"
+#       body:
+#        {"server":
+#         {
+#          "name": "XYZ1.XXXXX.COM",
+#          "host": "10.0.0.4",
+#          "port-list": [
+#          {"port-number": 80,
+#           "protocol": "tcp"}
+#          ]
+#          }
+#        }
+#
+#    - name: CREATE SERVER XYZ2.XXXXX.COM
+#      uri:
+#       url: https://192.168.1.2/axapi/v3/slb/server \
+#       method: POST
+#       body_format: json
+#       validate_certs: no
+#       return_content: yes
+#       headers:
+#        Authorization: "A10 {{ login.json.authresponse.signature }}"
+#       body:
+#        {"server":
+#         {
+#          "name": "XYZ2.XXXXX.COM",
+#          "host": "10.0.0.5",
+#          "port-list": [
+#          {"port-number": 80,
+#           "protocol": "tcp"}
+#          ]
+#          }
+#        }
+#
+#    - name: CREATE XYZ.XXXXX.COM HTTP SERVICE GROUP
+#      uri:
+#       url: https://192.168.1.2/axapi/v3/slb/service-group \
+#       method: POST
+#       body_format: json
+#       validate_certs: no
+#       return_content: yes
+#       headers:
+#        Authorization: "A10 {{ login.json.authresponse.signature }}"
+#       body:
+#        {"service-group":
+#         {
+#          "name": "XYZ.XXXXX.COM-HTTP",
+#          "protocol": "tcp",
+#          "health-check": "XYZ-TCP-80",
+#          "member-list": [
+#          {"name": "XYZ1.XXXXX.COM",
+#          "port": 80},
+#          {"name": "XYZ2.XXXXX.COM",
+#          "port": 80}
+#          ]
+#         }
+#        }
+#
+#    - name: CREATE XYZ.XXXXX.COM VIRTUAL SERVER
+#      uri:
+#       url: https://192.168.1.2/axapi/v3/slb/virtual-server \
+#       method: POST
+#       body_format: json
+#       validate_certs: no
+#       return_content: yes
+#       headers:
+#        Authorization: "A10 {{ login.json.authresponse.signature }}"
+#       body:
+#        {"virtual-server":
+#         {
+#          "name": "XYZ.XXXXX.COM",
+#          "ip-address": 192.168.10.3,
+#          "netmask": 255.255.255.255,
+#          "port-list": [
+#          {"port-number": 80,
+#          "protocol": "tcp"},
+#          {"name": "XYZ.XXXXX.COM-HTTP"},
+#          {"service-group": "XYZ.XXXXX.COM-HTTP"}
+#          ]
+#         }
+#        }
+#
+# PLAY #3
+# PLACE VIRTUAL SERVER XYZ.XXXXX.COM UNDER SIEGE
+#
+- name: SIEGE LOAD GENERATOR
+  hosts: 192.168.10.3
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: SIEGE XYZ.XXXXX.COM
+      command: siege -t 10s http://192.168.10.3
+
+      register: siege_output
+
+    - name: SIEGE XYZ.XXXXX.COM OUTPUT
+      debug:
+        var: siege_output
+
+    - name: INSERT XYZ.XXXXX.COM SIEGE OUTPUT INTO JINJA2 TEMPLATE
+      template: >
+        src=/root/Automation/Jinja2/A10-working-httperf-jinja2.j2
+        dest=/root/Output/A10/a10-siege-output.txt
+#
+# PLAY #4
+# DISPLAY RESULTS OF VIRTUAL SERVER XYZ.XXXXX.COM SIEGE
+#
+- name: A10 Validation
+  hosts: 192.168.1.2
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: A10 LOGINs
+      uri:
+       url: https://192.168.1.2/axapi/v3/auth
+       method: POST
+       validate_certs: no
+       body_format: json
+       body:
+        credentials:
+            username: admin
+            password: a10
+
+      register: login
+
+    - name: VIRTUAL-SERVER XYZ.XXXXX.COM
+      uri:
+       url: https://192.168.1.2/axapi/v3/slb/virtual-server/XYZ.XXXXX.COM/oper \
+       method: GET
+       body_format: json
+       validate_certs: no
+       return_content: yes
+       headers:
+        Authorization: "A10 {{ login.json.authresponse.signature }}"
+
+      register: virtual_server_output
+
+    - name: VIRTUAL-SERVER XYZ.XXXXX.COM OUTPUT
+      debug: var=virtual_server_output
+
+    - name: SERVICE GROUP XYZ.XXXXX.COM-HTTP
+      uri:
+       url: https://192.168.1.2/axapi/v3/slb/service-group/XYZ.XXXXX.COM-HTTP/stats \
+       method: GET
+       body_format: json
+       validate_certs: no
+       return_content: yes
+       headers:
+        Authorization: "A10 {{ login.json.authresponse.signature }}"
+
+      register: service_group_output
+
+    - name: SERVICE GROUP XYZ.XXXXX.COM-HTTP OUTPUT
+      debug: var=service_group_output
+
+    - name: SERVER XYZ1
+      uri:
+       url: https://192.168.1.2/axapi/v3/slb/server/XYZ1.XXXXX.COM/oper \
+       method: GET
+       body_format: json
+       validate_certs: no
+       return_content: yes
+       headers:
+        Authorization: "A10 {{ login.json.authresponse.signature }}"
+
+      register: server_xyz1_output
+
+    - name: SERVER XYZ1 OUTPUT
+      debug: var=server_xyz1_output
+
+    - name: SERVER XYZ2
+      uri:
+       url: https://192.168.1.2/axapi/v3/slb/server/XYZ2.XXXXX.COM/oper \
+       method: GET
+       body_format: json
+       validate_certs: no
+       return_content: yes
+       headers:
+        Authorization: "A10 {{ login.json.authresponse.signature }}"
+
+      register: server_xyz2_output
+
+    - name: SERVER XYZ OUTPUT
+      debug: var=server_xyz2_output
+
+    - name: INSERT A10 VALIDATION OUTPUT INTO JINJA2 TEMPLATE
+      template: >
+        src=/root/Automation/Jinja2/A10-working-jinja2.j2
+        dest=/root/Output/A10/a10-validation-output.txt
+#
+# PLAY #5
+# COMBINE ALL OUTPUTS INTO ONE FILE
+#
+- name: COMBINE ALL OUTPUTS
+  hosts: 192.168.1.2
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: COMBINE OUTPUTS FROM JINJA2 TEMPLATES.
+      assemble:
+        src: /root/Output/A10
+        dest: /root/Output/A10/a10-final-jinja2-output.txt
