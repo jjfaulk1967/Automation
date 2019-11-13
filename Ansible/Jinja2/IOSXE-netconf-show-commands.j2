@@ -1,0 +1,52 @@
+
+Cisco IOS-XE
+
+Show version:
+
+Hostname: {{ show_version_output.response[0].hostname }}
+Hardware: {{ show_version_output.response[0].hardware[0] }}
+Serial Number: {{ show_version_output.response[0].serial[0] }}
+Uptime: {{ show_version_output.response[0].uptime }}
+Last Reload Reason: {{ show_version_output.response[0].reload_reason }}
+IOS Version: {{ show_version_output.response[0].version }}
+
+Interface Status:
+
+                Interface: {{ show_ip_int_brief_output.response[0].intf }}
+                IP Address: {{ show_ip_int_brief_output.response[0].ipaddr }}
+                Status: {{ show_ip_int_brief_output.response[0].status }}
+
+                Interface: {{ show_ip_int_brief_output.response[1].intf }}
+                IP Address: {{ show_ip_int_brief_output.response[1].ipaddr }}
+                Status: {{ show_ip_int_brief_output.response[1].status }}
+
+                Interface: {{ show_ip_int_brief_output.response[2].intf }}
+                IP Address: {{ show_ip_int_brief_output.response[2].ipaddr }}
+                Status: {{ show_ip_int_brief_output.response[2].status }}
+
+                Interface: {{ show_ip_int_brief_output.response[3].intf }}
+                IP Address: {{ show_ip_int_brief_output.response[3].ipaddr }}
+                Status: {{ show_ip_int_brief_output.response[3].status }}
+
+                Interface: {{ show_ip_int_brief_output.response[4].intf }}
+                IP Address: {{ show_ip_int_brief_output.response[4].ipaddr }}
+                Status: {{ show_ip_int_brief_output.response[4].status }}
+
+Show IP BGP summary:
+
+                BGP Neighbor: {{show_ip_bgp_sum_output.response[0].bgp_neigh }}
+                Local ASN: {{show_ip_bgp_sum_output.response[0].local_as }}
+                Remote ASN: {{show_ip_bgp_sum_output.response[0].neigh_as }}
+                Number of received prefixes: {{show_ip_bgp_sum_output.response[0].state_pfxrcd }}
+
+                BGP Neighbor: {{show_ip_bgp_sum_output.response[1].bgp_neigh }}
+                Local ASN: {{show_ip_bgp_sum_output.response[1].local_as }}
+                Remote ASN: {{show_ip_bgp_sum_output.response[1].neigh_as }}
+                Number of received prefixes: {{show_ip_bgp_sum_output.response[1].state_pfxrcd }}
+
+Show default route:
+
+                Network: {{ show_ip_route_output.response[0].network }}
+                Next hop IP address: {{ show_ip_route_output.response[0].nexthop_ip }}
+                Administrative distance: {{ show_ip_route_output.response[0].distance }}
+                Uptime: {{ show_ip_route_output.response[0].uptime }}
