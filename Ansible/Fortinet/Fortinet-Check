@@ -1,0 +1,190 @@
+---
+- name: Define Host
+  hosts: localhost
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: fortigate_network_device
+      prompt: Which Fortigate firewall would you like to connect to?
+      private: no
+
+  tasks:
+    - add_host:
+        name: "{{ fortigate_network_device }}"
+        groups: dynamically_created_hosts
+
+- name: Fortigate Firewall Check
+  hosts: dynamically_created_hosts
+  gather_facts: false
+  connection: local
+
+  vars_prompt:
+    - name: user
+      prompt: What is your login name?
+      private: no
+    - name: password
+      prompt: What is your password?
+      private: yes
+      register: results
+
+  tasks:
+    - name: FORTIGATE LOGIN
+      uri:
+       url: https://{{ inventory_hostname }}/logincheck
+       method: POST
+       validate_certs: no
+       body_format: form-urlencoded
+       body:
+        username: "{{ user }}"
+        secretkey: "{{ password }}"
+        ajax: 1
+
+      register: login
+
+    - name: GLOBAL
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/cmdb/system/global
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+        Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: system_global
+
+    - name: GLOBAL RESOURCES
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/monitor/system/global-resources/select/
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+        Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: system_global_resources
+
+    - name: SYSTEM RESOURCE USAGE
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/monitor/system/resource/usage
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+        Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: system_resource_usage
+
+    - name: VIRTUAL WAN HEALTH CHECK
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/monitor/virtual-wan/health-check/select/
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+        Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: virtual_wan_health_check
+
+    - name: VIRTUAL WAN MEMBERS CHECK
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/monitor/virtual-wan/members/select/
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+         Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: virtual_wan_members_check
+
+    - name: TOP TALKERS
+      uri:
+       url: https://{{ inventory_hostname }}/api/v2/monitor/fortiview/statistics?filter=%7B%7D&ip_version=ipboth&realtime=true&report_by=destination&sort_by=bandwidth
+       method: GET
+       body_format: form-urlencoded
+       validate_certs: no
+       return_content: yes
+       headers:
+        Content-Type: application/json
+        Accept: application/json
+        Cookie: "{{ login.set_cookie }}"
+
+      register: top_talkers
+
+    - name: PRTG FIND DEVICE ID
+      uri:
+       url: https://10.11.6.6/api/table.json?content=devices&output=json&columns=objid,name,host
+       method: GET
+       validate_certs: no
+       body_format: form-urlencoded
+       body:
+        username: "{{ user }}
+        password: "{{ password }}"
+        filter_name: "{{ inventory_hostname }}"
+
+      register: prtg_device_id
+
+    - name: PRTG DEVICE UPTIME
+      uri:
+       url: https://10.11.6.6/api/table.json?content=sensors&output=json&columns=objid,device,sensor,status,lastvalue,parentid
+       method: GET
+       validate_certs: no
+       body_format: form-urlencoded
+       body:
+        username: "{{ user }}"
+        password: "{{ password }}"
+        filter_parentid: "{{ prtg_device_id.json.devices[0].objid }}"
+        filter_sensor: "Uptime"
+
+      register: prtg_device_uptime
+
+    - name: PRTG BGP PEER
+      uri:
+       url: https://10.11.6.6/api/table.json?content=sensors&output=json&columns=objid,device,sensor,status,lastvalue,parentid
+       method: GET
+       validate_certs: no
+       body_format: form-urlencoded
+       body:
+        username: "{{ user }}"
+        password: "{{ password }}"
+        filter_parentid: "{{ prtg_device_id.json.devices[0].objid }}"
+        filter_sensor: "@sub(BGP)"
+
+      register: prtg_bgp_peer
+
+    - name: API RESULTS
+      debug:
+        msg:
+          - "The hostname of this firewall is {{ system_global.json.results.hostname }}"
+          - "{{ system_global.json.results.hostname }} has been up for {{ prtg_device_uptime.json.sensors[0].lastvalue }}."
+          - "The serial number of this firewall is {{ system_global.json.serial }}"
+          - "The firmware of this firewall is {{ system_global.json.version }}"
+          - "Current CPU utilization is {{ system_resource_usage.json.results.cpu[0].current }} %"
+          - "Current memory utilization is {{ system_resource_usage.json.results.mem[0].current }} %"
+          - "The current number of active sessions is {{ system_global_resources.json.results.session.current_usage }}"
+          - "Internet monitor performance SLA for WAN 1 is STATUS {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan1.status }}, JITTER {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan1.jitter }} ms, LATENCY {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan1.latency }} ms, PACKET LOSS {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan1.packet_loss }}% "
+          - "Internet monitor performance SLA for WAN 2 is STATUS {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan2.status }}, JITTER {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan2.jitter }} ms, LATENCY {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan2.latency }} ms, PACKET LOSS {{ virtual_wan_health_check.json.results.INTERNET_MONITOR.wan2.packet_loss }}% "
+          - "Ring Central performance SLA is STATUS {{ virtual_wan_health_check.json.results.RC_Monitoring.wan2.status }}, JITTER {{ virtual_wan_health_check.json.results.RC_Monitoring.wan2.jitter }}ms, LATENCY {{ virtual_wan_health_check.json.results.RC_Monitoring.wan2.latency }}ms, PACKET LOSS {{ virtual_wan_health_check.json.results.RC_Monitoring.wan2.packet_loss }}% "
+          - "WAN 1 bandwidth utilization is UPLOAD {{ virtual_wan_members_check.json.results.wan1.tx_bandwidth }} kB/s, DOWNLOAD {{ virtual_wan_members_check.json.results.wan1.rx_bandwidth }} kB/s "
+          - "WAN 2 bandwidth utilization is UPLOAD {{ virtual_wan_members_check.json.results.wan2.tx_bandwidth }} kB/s, DOWNLOAD {{ virtual_wan_members_check.json.results.wan2.rx_bandwidth }} kB/s "
+          - "Top Talker: SRC IP: {{ top_talkers.json.results.details[0].srcaddr }}, DST IP: {{ top_talkers.json.results.details[0].dstaddr }}, DST PORT: {{ top_talkers.json.results.details[0].dst_port }}, TX BW: {{ top_talkers.json.results.details[0].tx_bandwidth }} kbps, RX BW: {{ top_talkers.json.results.details[0].rx_bandwidth }} kbps "
+          - "{{ prtg_bgp.json.sensors[0].sensor }} is {{ prtg_bgp.json.sensors[0].status }}"
+          - "{{ prtg_bgp.json.sensors[1].sensor }} is {{ prtg_bgp.json.sensors[1].status }}"
+          - "{{ prtg_bgp.json.sensors[2].sensor }} is {{ prtg_bgp.json.sensors[2].status }}"
+          - "{{ prtg_bgp.json.sensors[3].sensor }} is {{ prtg_bgp.json.sensors[3].status }}"
+          - "PRTG link to {{ system_global.json.results.hostname }} is https://10.11.6.6/device.htm?id={{ prtg_device_id.json.devices[0].objid }}&tabid=1"
