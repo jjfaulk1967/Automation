@@ -1,0 +1,40 @@
+
+A10 VALIDATION RESULTS
+
+WWW.XYZ.xxxxx.COM
+
+Virtual Server: {{ virtual_server_output.json['virtual-server'].name }}
+  Operational State: {{ virtual_server_output.json['virtual-server'].oper.state }}
+    Port Number: {{ virtual_server_output.json['virtual-server']['port-list'][0]['port-number'] }}
+    Protocol: {{ virtual_server_output.json['virtual-server']['port-list'][0].protocol }}
+
+    Service Group: {{ service_group_output.json['service-group'].name }}
+      Member Name: {{ service_group_output.json['service-group']['member-list'][0].name }}
+        Port: {{ service_group_output.json['service-group']['member-list'][0].port }}
+        Current Connections: {{ service_group_output.json['service-group']['member-list'][0].stats.curr_conn }}
+        Current Requests: {{ service_group_output.json['service-group']['member-list'][0].stats.curr_req }}
+        Slowest Response Time: {{ service_group_output.json['service-group']['member-list'][0].stats.slowest_rsp_time }}
+        Fastest Response Time: {{ service_group_output.json['service-group']['member-list'][0].stats.fastest_rsp_time }}
+        Total Forwarded Packets: {{ service_group_output.json['service-group']['member-list'][0].stats.total_fwd_pkts }}
+        Total Forwarded Bytes: {{ service_group_output.json['service-group']['member-list'][0].stats.total_fwd_bytes }}
+        Total Connections: {{ service_group_output.json['service-group']['member-list'][0].stats.total_conn }}
+
+      Member Name: {{ service_group_output.json['service-group']['member-list'][1].name }}
+        Port: {{ service_group_output.json['service-group']['member-list'][1].port }}
+        Current Connections: {{ service_group_output.json['service-group']['member-list'][1].stats.curr_conn }}
+        Current Requests: {{ service_group_output.json['service-group']['member-list'][1].stats.curr_req }}
+        Slowest Response Time: {{ service_group_output.json['service-group']['member-list'][1].stats.slowest_rsp_time }}
+        Fastest Response Time: {{ service_group_output.json['service-group']['member-list'][1].stats.fastest_rsp_time }}
+        Total Forwarded Packets: {{ service_group_output.json['service-group']['member-list'][1].stats.total_fwd_pkts }}
+        Total Forwarded Bytes: {{ service_group_output.json['service-group']['member-list'][1].stats.total_fwd_bytes }}
+        Total Connections: {{ service_group_output.json['service-group']['member-list'][1].stats.total_conn }}
+
+          Real Server: {{ server_xyz1_output.json.server.name }}
+            Operational State: {{ server_xyz1_output.json.server.oper.state }}
+            Port: {{ server_xyz1_output.json.server['port-list'][0]['port-number'] }}
+            Protocol: {{ server_xyz1_output.json.server['port-list'][0].protocol }}
+
+          Real Server: {{ server_xyz2_output.json.server.name }}
+            Operational State: {{ server_xyz2_output.json.server.oper.state }}
+            Port: {{ server_xyz2_output.json.server['port-list'][0]['port-number'] }}
+            Protocol: {{ server_xyz2_output.json.server['port-list'][0].protocol }}
