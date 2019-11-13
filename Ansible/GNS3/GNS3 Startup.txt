@@ -1,0 +1,46 @@
+1) Update ansible.
+
+$ sudo apt-get update
+$ sudo apt-get install software-properties-common
+$ sudo apt-add-repository ppa:ansible/ansible
+$ sudo apt-get update
+$ sudo apt-get install ansible
+
+2) edit /etc/hosts
+
+192.168.1.2 A10-MGMT
+192.168.10.3 XYZ.XXXXX.COM
+
+3) apt-get install httperf
+   apt-get install git
+
+4) Connect servers Ubuntu 4/5 from Eth1 to etherswich-1
+
+/etc/network/interfaces
+
+5) apt-get update ubuntu 4/5
+
+6) Install WEBFS on Ubuntu 4/5
+
+apt-get install webfs
+!
+service webfs start
+!
+Edit /etc/webfsd.conf and set listening port to 80.
+!
+Create /var/www/html/index.html. Set chmod to 755.
+!
+Install PYANG
+! pip install pyang
+! git clone https://github.com/YangModels/yang.git
+
+Ubuntu workstations
+1) install openssh = apt-get install openssh-server
+2) Start ssh service = service ssh start
+3) Create user = adduser "user"
+4) Set user "user" to root = usermod -aG sudo "user"
+5) Install python = apt-get install python
+6) Install iperf3 = apt-get install iperf3
+
+NetworkAutomation Server
+1) chown root ~/.ssh/config
