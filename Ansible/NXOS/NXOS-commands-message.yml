@@ -1,0 +1,45 @@
+---
+- name: Switch S6
+  hosts: 192.168.122.110
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: Show Commands
+      nxos_command:
+        commands:
+        - command: show version
+          output: json
+        - command: show system resources
+          output: json
+        - command: show spanning-tree vlan 1
+          output: json
+        - command: show hsrp
+        	output: json
+        - command: show ip eigrp
+        	output: json
+        - command: show ip eigrp neighbors
+        	output: json
+        - command: show ip eigrp topology summary
+        	output: json
+        - command: show ip route 0.0.0.0
+        	output: json
+
+      register: output
+
+    - name: Show Commands Output
+      debug:
+        msg:
+          - "The hostname of this switch is {{ output.stdout[0].host_name }}"
+          - "The brand of this switch is {{ output.stdout[0].manufacturer }}"
+          - "The uptime of {{ output.stdout[0].host_name }} is {{ output.stdout[0].kern_uptm_days }} DAYS {{ output.stdout[0].kern_uptm_hrs }} HOURS {{ output.stdout[0].kern_uptm_mins }} MINUTES {{ output.stdout[0].kern_uptm_secs }} SECONDS"
+          - "The last restart reason for {{ output.stdout[0].host_name }} is {{ output.stdout[0].rr_reason }}"
+          - "Load average for CPU is 1 MIN ({{ output.stdout[1].load_avg_1min }}) 5 MIN ({{ output.stdout[1].load_avg_5min }}) 15 MIN ({{output.stdout[1].load_avg_15min }})"
+          - "Memory utilization for {{ output.stdout[0].host_name }} is TOTAL ({{ output.stdout[1].memory_usage_total }}) USED ({{ output.stdout[1].memory_usage_used }}) FREE ({{output.stdout[1].memory_usage_free }})"
+          - "The last STP change for VLAN {{ output.stdout[2].TABLE_tree.ROW_tree.tree.id }} is {{ output.stdout[2].TABLE_tree.ROW_tree.topology_change_time_since_last }} seconds ago."
+          - "Interface {{ output.stdout[3].TABLE_grp_detail.ROW_grp_detail.sh_if_index }} is HSRP {{ output.stdout[3].TABLE_grp_detail.ROW_grp_detail.sh_group_state }}. Last state change was {{ output.stdout[3].TABLE_grp_detail.ROW_grp_detail.sh_last_state_change }} seconds ago."
+          - "EIGRP process {{ output.stdout[4].TABLE_asn.ROW_asn.asn }} has a router ID of {{ output.stdout[4].TABLE_asn.ROW_asn.TABLE_vrf.ROW_vrf[0].router_id }}. It has {{ output.stdout[4].TABLE_asn.ROW_asn.TABLE_vrf.ROW_vrf[1].num_peers }} peers."
+          - "EIGRP peer {{ output.stdout[5].TABLE_asn.ROW_asn.TABLE_vrf.ROW_vrf.TABLE_peer.ROW_peer.peer_ipaddr }} has been up for {{ output.stdout[5].TABLE_asn.ROW_asn.TABLE_vrf.ROW_vrf.TABLE_peer.ROW_peer.peer_uptime }} seconds."
+	  - "EIGRP topology database has {{ output.stdout[6].TABLE_asn.ROW_asn.TABLE_vrf.ROW_vrf[1].route_count }} learned prefixes."
+	  - "Default route has been present for (Hour.Minutes.Seconds) {{ output.stdout[7].TABLE_vrf.ROW_vrf.TABLE_addrf.ROW_addrf.TABLE_prefix.ROW_prefix.TABLE_path.ROW_path[0].uptime }}"
+	  - "Default route next hop address is {{ output.stdout[7].TABLE_vrf.ROW_vrf.TABLE_addrf.ROW_addrf.TABLE_prefix.ROW_prefix.TABLE_path.ROW_path[0].ipnexthop }}"
