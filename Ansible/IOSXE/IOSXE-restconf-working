@@ -1,0 +1,14 @@
+- name: IOS-XE (RESTCONF)
+  hosts: 192.168.122.10
+  gather_facts: false
+  connection: local
+
+  tasks:
+
+    - name: SHOW INTERFACES
+      uri:
+       url: https://192.168.122.10/restconf/data/Cisco-IOS-XE-native:native/ \
+       method: GET
+       body_format: json
+       validate_certs: no
+       return_content: yes
