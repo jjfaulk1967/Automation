@@ -1,0 +1,13 @@
+!
+#Installation of pyATS & Genie on Ubuntu
+1) apt-get update
+2) apt-get install python3
+3) apt install python3-pip
+4) pip3 install --upgrade pip
+5) apt-get install python3-venv
+6) python3 -m venv virtual
+7) source virtual/bin/activate
+8) pip install --upgrade pip setuptools
+9) pip install pyats genie
+10) pip install pyats.robot genie.libs.robot
+11) pip install --upgrade genie genie.abstract genie.conf genie.examples genie.harness genie.libs.conf genie.libs.filetransferutils genie.libs.ops genie.libs.parser genie.libs.robot genie.libs.sdk genie.libs.telemetry genie.metaparser genie.ops genie.parsergen genie.predcore genie.telemetry genie.utils unicon genie.trafficgen pyats
