@@ -1,0 +1,155 @@
+Ansible Notes
+!
+
+AD-HOC Commands
+!
+ansible GNS3-xxxxx01A -m raw -a "show version" -u cisco -k
+!
+ansible GNS3-xxxxx01A -m raw -a "show version" -u cisco -k | grep 'SUCCESS\|Version'
+!
+ansible GNS3-xxxxx01A -m raw -a "show version" -u cisco -k | grep 'SUCCESS\|Version' > usernames.txt
+!
+PLAYBOOKS
+!
+---
+- name: Get ARP information
+  hosts: all
+  gather_facts: false
+
+
+  tasks:
+    - name: show arp
+      raw: "show arp"
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+	
+---
+- name: show version and other user level commands
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run multiple commands on remote nodes
+      ios_command:
+        commands:
+          - show version
+          - show ip int brief
+
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+	
+---
+- name: Backup show version and other user level commands
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run multiple commands on remote nodes
+      ios_command:
+        commands:
+          - show version
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+
+    - name: save output to a file
+      copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
+	  
+---
+- name: Backup show run (enable mode commands)
+  hosts: all
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: run enable level commands
+      ios_command:
+        authorize: yes
+        commands:
+          - show run
+
+      register: print_output
+
+    -  debug: var=print_output.stdout_lines
+
+    - name: save output to a file
+      copy: content="{{ print_output.stdout[0] }}" dest="./output/{{ inventory_hostname }}.txt"
+
+!
+---
+- name: show ip bgp sum
+  hosts: XXX-XX-XXXX
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: show ip bgp sum
+      ios_command:
+        provider:
+          username: cisco
+          password: cisco
+          host: "{{ inventory_hostname }}"
+        commands:
+        - sh ip bgp neighbors | inc neighbor is|=
+
+
+      register: print_output
+
+    - debug:
+       var: print_output.stdout
+
+!
+ansible.cfg
+!
+[defaults]
+inventory = ./gns3hosts
+host_key_checking = False
+timeout = 5
+stdout_callback = yaml
+!
+---
+- name: netconf
+  hosts: GNS3-xxxxx01A
+  gather_facts: false
+  connection: local
+
+  tasks:
+    - name: netconf
+      netconf_config:
+        xml: "{{ lookup('file', './netconf.xml') }}"
+        look_for_keys: no
+        hostkey_verify: no
+        host: 192.168.122.10
+        username: cisco
+        password: cisco
+
+      register: print_output
+
+    - debug:
+       var: print_output.stdout
+!
+root@NetworkAutomation-1:~# cat netconf.xml
+<?xml version="1.0"?>
+<nc:rpc message-id="101" xmlns:nc="urn:ietf:params:xml:ns:netconf:base:1.0">
+    <nc:get>
+        <nc:filter type="subtree">
+            <native xmlns="http://cisco.com/ns/yang/ned/ios">
+             <interface>
+              <GigabitEthernet>
+               <name>1</name>
+                 <ip></ip>
+              </GigabitEthernet>
+             </interface>
+            </native>
+        </nc:filter>
+    </nc:get>
+</nc:rpc>
+
+
